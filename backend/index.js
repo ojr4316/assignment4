@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const bodyParser = require('body-parser');
+const path = require('path');
 const app = express();
 const PORT = 80;
 
@@ -14,9 +15,14 @@ app.listen(PORT, (error) => {
 });
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
-app.use(express.static('build'));
+
+app.use(express.static('build', {}));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 let users = []; // { username: clientToken }
+
 
 app.post('/login', (req, res) => {
   const { username = '', password = '' } = req.body || {};
