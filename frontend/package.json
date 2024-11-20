@@ -17,7 +17,7 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "deploy": "react-scripts build && shx mv build ../backend && shx rm -rf build",
+    "deploy": "shx rm -rf ../backend/build && react-scripts build && shx mv build ../backend && shx rm -rf build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

@@ -46,9 +46,10 @@ export default function Login() {
   }
 
   return (
-    <div>
-      <p>{error}</p>
-      <form onSubmit={signin}>
+    <div className="full_page">
+      <h1 className="title"> Satellite Tracker </h1>
+      <p className="error">{error}</p>
+      <form onSubmit={signin} className="login_form">
         <input
           type="text"
           placeholder="Username"
@@ -61,7 +62,7 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <input type="submit" value="Login" />
+        <input className="submit" type="submit" value="Login" />
       </form>
     </div>
   );

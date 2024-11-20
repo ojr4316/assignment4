@@ -3,6 +3,7 @@ const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const bodyParser = require('body-parser');
 const path = require('path');
+const Ship = require('./ship');
 const app = express();
 const PORT = 80;
 
@@ -17,12 +18,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use(express.static('build', {}));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
 
-let users = []; // { username: clientToken }
+let ship = new Ship();
 
+setInterval(() => {
+  if (Math.random() < 0.3) {
+    ship.travel();
+  }
+}, 500);
+
+let users = {}; // { username: clientToken, ... }
+let privilegedUsers = ['Mike'];
 
 app.post('/login', (req, res) => {
   const { username = '', password = '' } = req.body || {};
@@ -31,7 +37,7 @@ app.post('/login', (req, res) => {
     return;
   }
   let userExists = false;
-  for (const user of users) {
+  for (const user of Object.keys(users)) {
     if (Object.keys(user)[0] === username) {
       userExists = true;
       break;
@@ -42,7 +48,7 @@ app.post('/login', (req, res) => {
     res.status(400).json({ error: 'User already exists' });
   } else {
     let token = uuidv4();
-    users.push({ [username]: token });
+    users[username] = token;
     res.status(200).json({ clientId: token });
   }
 });
@@ -50,50 +56,61 @@ app.post('/login', (req, res) => {
 app.post('/logout', (req, res) => {
   const { username, password } = req.body;
 
-  users = users.filter((user) => user.username !== username);
+  delete users[username];
   res.status(200).json({ message: 'User logged out' });
 });
 
-let userLocations = {};
-
 app.get('/gps', (req, res) => {
-  let clientId = req.get("clientId")
-  if (!clientId) {
-    res.status(400).json({ error: 'Log in first' });
-    return;
+  let token = verifyToken(req, res);
+
+  if (token) {
+    let { clientId, clientName } = token;
+    res.status(200).json(ship.toJSON());
   }
-  if (clientId in userLocations) {
-    res.status(200).json(userLocations[clientId]);
-  }
-  else {
-    let location = { latitude: Math.random()*360, longitude: Math.random()*360, height : Math.random()*100, distance : Math.random()*1000}; 
-    userLocations[clientId] = location;
-    res.status(200).json(location);
-  }
-  return;
 });
 
-let privligedUsers = ["Mike"];
-
-app.get('/system-vitals', (req, res) => {
-  let clientId = req.get("clientId")
-  if (!clientId) {
-    res.status(400).json({ error: 'Log in first' });
-    return;
-  }
-  let username = null;
-  for (const user of users) {
-    if (Object.keys(user)[1] === clientId) {
-      username = Object.keys(user)[0];
-      break;
+app.post('/toggle', (req, res) => {
+  let token = verifyToken(req, res);
+  if (token) {
+    let { clientId, clientName } = token;
+    if (privilegedUsers.includes(clientName)) {
+      ship.sensorsActive = !ship.sensorsActive;
+      res.status(200).json({ sensorsActive: ship.sensorsActive });
+    } else {
+      res.status(400).json({ error: 'Unprivileged user' });
     }
   }
+});
 
-  if (privligedUsers.includes(username)) {
-    res.status(200).json({"system-vitals" : "The system is ok"});
-    return;
+app.get('/system-vitals', (req, res) => {
+  let token = verifyToken(req, res);
+
+  if (token) {
+    let { clientId, clientName } = token;
+    if (privilegedUsers.includes(clientName)) {
+      res.status(200).json({ system_vitals: 'The system is ok' });
+    } else {
+      res.status(400).json({ error: 'Unprivileged user' });
+    }
   }
-  else {
-    res.status(400).json({error : "Unprivileged user"});
+});
+
+function verifyToken(req, res) {
+  let clientName = req.get('clientName');
+  let clientId = req.get('clientId');
+
+  if (!clientId || !clientName) {
+    res.status(400).json({ error: 'Log in first' });
+    return false;
   }
+  if (clientName in users && users[clientName] === clientId) {
+    return { clientId, clientName };
+  } else {
+    res.status(400).json({ error: 'Invalid token' });
+    return false;
+  }
+}
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
