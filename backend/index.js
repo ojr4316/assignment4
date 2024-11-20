@@ -53,3 +53,47 @@ app.post('/logout', (req, res) => {
   users = users.filter((user) => user.username !== username);
   res.status(200).json({ message: 'User logged out' });
 });
+
+let userLocations = {};
+
+app.get('/gps', (req, res) => {
+  let clientId = req.get("clientId")
+  if (!clientId) {
+    res.status(400).json({ error: 'Log in first' });
+    return;
+  }
+  if (clientId in userLocations) {
+    res.status(200).json(userLocations[clientId]);
+  }
+  else {
+    let location = { latitude: Math.random()*360, longitude: Math.random()*360, height : Math.random()*100, distance : Math.random()*1000}; 
+    userLocations[clientId] = location;
+    res.status(200).json(location);
+  }
+  return;
+});
+
+let privligedUsers = ["Mike"];
+
+app.get('/system-vitals', (req, res) => {
+  let clientId = req.get("clientId")
+  if (!clientId) {
+    res.status(400).json({ error: 'Log in first' });
+    return;
+  }
+  let username = null;
+  for (const user of users) {
+    if (Object.keys(user)[1] === clientId) {
+      username = Object.keys(user)[0];
+      break;
+    }
+  }
+
+  if (privligedUsers.includes(username)) {
+    res.status(200).json({"system-vitals" : "The system is ok"});
+    return;
+  }
+  else {
+    res.status(400).json({error : "Unprivileged user"});
+  }
+});
