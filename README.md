@@ -1,5 +1,9 @@
-## Assignment 4
+## Assignment 4-5
 ### Satellite Tracker - Secure Session Management
+
+### Testing
+1. Run server backend (`cd backend` and `npm start`)
+2. Run tests (`cd testing` and `python main.py -v`)
 
 ### Use Cases
 - No authentication - Don't provide a username or password

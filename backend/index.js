@@ -38,7 +38,7 @@ app.post('/login', (req, res) => {
   }
   let userExists = false;
   for (const user of Object.keys(users)) {
-    if (Object.keys(user)[0] === username) {
+    if (user === username) {
       userExists = true;
       break;
     }
@@ -73,7 +73,7 @@ app.post('/toggle', (req, res) => {
   let token = verifyToken(req, res);
   if (token) {
     let { clientId, clientName } = token;
-    if (privilegedUsers.includes(clientName)) {
+    if (isPrivileged(clientName)) {
       ship.sensorsActive = !ship.sensorsActive;
       res.status(200).json({ sensorsActive: ship.sensorsActive });
     } else {
@@ -87,13 +87,19 @@ app.get('/system-vitals', (req, res) => {
 
   if (token) {
     let { clientId, clientName } = token;
-    if (privilegedUsers.includes(clientName)) {
+    if (isPrivileged(clientName)) {
       res.status(200).json({ system_vitals: 'The system is ok' });
     } else {
       res.status(400).json({ error: 'Unprivileged user' });
     }
   }
 });
+
+function isPrivileged(name) {
+  return privilegedUsers.some((user) => user.includes(name));
+  /* CORRECT CODE: 
+    return privilegedUsers.includes(clientName); */
+}
 
 function verifyToken(req, res) {
   let clientName = req.get('clientName');
