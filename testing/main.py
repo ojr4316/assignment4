@@ -108,7 +108,7 @@ class TestSatelliteTracker(unittest.TestCase):
         self.assertEqual(code, 400, err_priv)
     
     """ Insecure Authentication: Our system currently does not encrypt passwords or validate them for the user on login. """
-
+    
     """ Bad Input Validation and Sanitization: No content or length requirements set for username or password, and can contain invalid characters and harmful injection sequences. (E.g. SQL/JS injection, spaces in “Mike”/“Mike “) """
 
     """ Insecure Token Management: Because we store a copy of a user's current session token locally, that could be copied along with their username from cookies to validate insecure requests."""

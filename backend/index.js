@@ -97,6 +97,7 @@ app.get('/system-vitals', (req, res) => {
 
 function isPrivileged(name) {
   return privilegedUsers.some((user) => user.includes(name));
+  
   /* CORRECT CODE: 
     return privilegedUsers.includes(clientName); */
 }
