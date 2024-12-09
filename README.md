@@ -26,7 +26,14 @@ Once authorized into the web app, users can view the current status of a satelli
 
 
 #### Architectural Breajers
-1. Session management: User has a valid session only if they have an active token registered with the server. (PASS)
+1. Session management: User has a valid session only if they have an active token registered with the server. We did create a test for this which will show a pass. Since this does have to do with the authorization process we created for assignment 4, this is already built into our system and will pass in this case. However, it is still something that is easily breakable when it comes to architecture.  In this smaller system, this works great and has little to no risk of going wrong, however, this would not work architecturally in larger systems. This is because if a larger system used this and the server were to go down or the active token
+had issues within the server, etc... this would lead to a really bad failure. Becuase of this, in a larger system to active token
+should be registered within different servers or stored in multiple locations, this would prevent a large architectural failure since
+if there were to be an issue with the server or if it were to go down for any reason, risks would be mitigated and hopefully no 
+large scale failure would occur! Another thing to consider since this is in terms of architecture is the fact that when wanting to
+further develop this application the scalability might be more difficult which means getting each of the tokens might take longer.
+Similarly to the server issues, with this sessions management since this is a small term application and don't expect a lot of 
+users to get on this application, it is totally fine here, however, it could lead to architectural degregation in the future!
 
 2. Role-based Access: Only users with valid credentials can access the system from a privileged context. We did create
 a test for this which will show a failure when given the case Mike2 over Mike and a user with the username Mike2 will have
