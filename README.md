@@ -47,7 +47,13 @@ the user is valid and if they have permission to perform that action. If the use
 and provide a successful response back to the web application, and if the user does not have access, the server will not perform any actions and instead provide an error message to the user. So, this is an architectural breaker we created in our code!
 
 
-3. Insecure Authentication: Our system currently does not encrypt passwords or validate them for the user on login.
+3. Insecure Authentication: Our system currently does not encrypt passwords or validate them for the user on login. This is 
+not one of the items we are testing! The overall issue here with no encrupting passwords or validating them are large security
+risks. A really great obvious exmaple of this is with an RIT network, if the username "liannapottgen" gave someone the access 
+they needed to get into my MyCourses account, gmail, google docs, SIS, eservices, etc... a lot of information could be stolen
+and put to mal use. This makes the application really vulnerable to attacks that can degrade the architecture of the program!
+Similarly to the other exmaples like with session management, since this is a super small scale assignment with no personal informaiton involved, not checking passwords is totally fine! However, once this were to move over into larger use it would cause issues with security, especially if the application started to take in personal information!
+
 
 4. Bad Input Validation and Sanitization: No content or length requirements set for username or password, and can contain invalid characters and harmful injection sequences. (E.g. SQL/JS injection, spaces in “Mike”/“Mike “). Depending on the specific implementation of the backend it is possible for overflow error to occur if we expect maximum lengths for certain inputs but never check. This would allow malicious actors to send specially crafted requests to the server to crash it or more. This breaker happens when parts of the code expect well formed requests without validating that the requests are properly well formed. Depending on the specific failure will dictate the severity of the issue and potential damage to the architecture. To test for this breaker would require understanding the assumptions a function makes about its inputs and making test cases to stress those assumptions to ensure that the assumptions are validated. A very similar breaker is the failure to sanitize user provided input i.e. SQL injection. Testing for this breaker is very similar to validation, understanding the assumption your functions that use user generated data make about the content of that data and creating tests to stress those assumptions. 
 
